@@ -199,10 +199,19 @@ export default function SignupPage({ onAuthenticated }) {
       const { email, password } = validateAccountDetails();
 
       if (!otpSent) {
-        throw new Error('Send OTP first before creating your account.');
+        throw new Error('Please click "Send OTP" first.');
       }
 
       const otpValue = String(formData.otp || '').trim();
+
+      if (!otpValue) {
+        throw new Error('Please enter the 6-digit OTP sent to your email.');
+      }
+
+      if (!/^\d{6}$/.test(otpValue)) {
+        throw new Error('OTP must be exactly 6 digits.');
+      }
+
       console.log('🔐 Verifying OTP:', { email, otp: otpValue });
 
       setIsCreatingAccount(true);
@@ -367,7 +376,7 @@ export default function SignupPage({ onAuthenticated }) {
 
             <button
               type="submit"
-              disabled={isCreatingAccount}
+              disabled={isCreatingAccount || !otpSent || !/^\d{6}$/.test(String(formData.otp || '').trim())}
               className="inline-flex w-full items-center justify-center gap-2 rounded-[20px] bg-[#1f2430] px-6 py-4 text-sm font-black text-[#fff7eb] shadow-[0_18px_40px_rgba(31,36,48,0.18)] transition cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_24px_48px_rgba(31,36,48,0.24)] disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isCreatingAccount ? 'Creating Account...' : 'Verify OTP and Continue'}
